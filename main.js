@@ -23,7 +23,7 @@ const pipeline = device.createRenderPipeline({
      },
 })
 
-const playerVertices = new Float32Array([0, 0.2, -0.1, 0.0, 0.1, 0.0]);
+const playerVertices = new Float32Array([0.0, 0.2, -0.1, 0.0, 0.1, 0.0]);
 const playerVertexBuffer = device.createBuffer({
   usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
   size: playerVertices.byteLength
@@ -37,12 +37,12 @@ const playerBuffer = device.createBuffer({
     size: playerXY.byteLength
 })
 
-let bullet = playerXY
-const bulletBuffer = device.createBuffer({
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    size: bullet.byteLength
+let bulletvertices = new Float32Array([0.0, 0.01, -0.01, -0.01, 0.01, -0.01])
+const bulletVertexBuffer = device.createBuffer({
+    usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+    size: bulletvertices.byteLength
 })
-device.queue.writeBuffer(bulletBuffer, 0, bullet)
+device.queue.writeBuffer(bulletVertexBuffer, 0, bulletvertices);
 
 const bindGroup = device.createBindGroup({
   layout: pipeline.getBindGroupLayout(0),
@@ -59,19 +59,21 @@ let x = 0;
 let y = -1;
 let left = false;
 let right = false;
+let shoot = false;
 const speed = 0.02;
 
 window.addEventListener('keydown', ev => { 
     if (ev.key == "a") left = true;
     if (ev.key == "d") right = true;
-
+    if (ev.key == " ") shoot = true;
 })
 
 window.addEventListener('keyup', ev => { 
     if (ev.key == "a") left = false;
     if (ev.key == "d") right = false;
-
+    if (ev.key == " ") shoot = false;
 })
+
 
 
 function update() { 
@@ -100,6 +102,7 @@ export function render() {
     });
     pass.setPipeline(pipeline);
     pass.setVertexBuffer(0, playerVertexBuffer);
+    // pass.setVertexBuffer(0, bulletVertexBuffer)
     pass.setBindGroup(0, bindGroup);
     pass.draw(3);  // call our vertex shader 3 times
     pass.end();

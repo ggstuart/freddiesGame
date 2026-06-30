@@ -12,6 +12,7 @@ export const module = device.createShaderModule({
     @builtin(position) position: vec4<f32>,
   };
 
+
   @group(0) @binding(0) var<storage> playerXY: vec2<f32>;
 
   @vertex fn vs(input: VertexInput) -> VertexOutput {
