@@ -1,5 +1,7 @@
-import { device, format } from "./setup.js";
-import { module } from "./shader.js";
+import { device, format } from "../setup.js";
+import { module } from "../shader.js";
+
+export const maxBullets = 50;
 
 export const bulletsPipeline = device.createRenderPipeline({
     label: "bullets pipeline",
@@ -42,7 +44,7 @@ device.queue.writeBuffer(bulletVertexBuffer, 0, bulletvertices);
 export const bulletXY = new Float32Array([0, 0]);
 export const bulletXYBuffer = device.createBuffer({
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    size: bulletXY.byteLength * 50
+    size: bulletXY.byteLength * maxBullets
 })
 
 export const bulletBindGroup = device.createBindGroup({

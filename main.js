@@ -1,8 +1,8 @@
 import { device, format, context } from "./setup.js";
 import { module } from "./shader.js";
 
-import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./player.js";
-import { bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXY, bulletXYBuffer } from "./bullets.js";
+import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./entities/player.js";
+import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXY, bulletXYBuffer } from "./entities/bullets.js";
 
 let x = 0;
 let y = -1;
@@ -12,7 +12,7 @@ let shoot = false;
 const speed = 0.02;
 const bulletSpeed = 0.0025;
 let bullets = [];
-const maxBullets = 50;
+
 
 window.addEventListener('keydown', ev => { 
     if (ev.key == "a") left = true;
@@ -63,7 +63,6 @@ export function render() {
 
     // // bullets
     if (bullets.length) {   
-        console.log("!!");
         
         pass.setPipeline(bulletsPipeline);
         pass.setVertexBuffer(0, bulletVertexBuffer);

@@ -1,5 +1,5 @@
-import { device, format } from "./setup.js";
-import { module } from "./shader.js";
+import { device, format } from "../setup.js";
+import { module } from "../shader.js";
 
 export const playerPipeline = device.createRenderPipeline({
     label: "player pipeline",
