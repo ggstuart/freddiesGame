@@ -1,13 +1,13 @@
 import { device, format } from "../setup.js";
 import { module } from "../shader.js";
 
-export const maxBullets = 50;
+export const maxEnemys = 50;
 
-export const bulletsPipeline = device.createRenderPipeline({
-    label: "bullets pipeline",
+export const enemysPipeline = device.createRenderPipeline({
+    label: "enemys pipeline",
     layout: 'auto',
     vertex: {
-        entryPoint: 'vsBullets',
+        entryPoint: 'vsEnemys',
         module,
         buffers: [
             {
@@ -19,14 +19,14 @@ export const bulletsPipeline = device.createRenderPipeline({
         ]
     },
     fragment: {
-        entryPoint: 'fsBullet',
+        entryPoint: 'fsEnemy',
         module,
         targets: [{ format }],
      },
 })
 
 
-let bulletvertices = new Float32Array([
+let enemyvertices = new Float32Array([
     0.0, 0.01,      // top middle
     -0.01, -0.01,   // bottom left
     0.01, -0.01,    // bottom right
@@ -34,25 +34,25 @@ let bulletvertices = new Float32Array([
     -0.01, -0.01,   // bottom left
     0.01, -0.01     // bottom right
 ])
-export const bulletVertexBuffer = device.createBuffer({
+export const enemyVertexBuffer = device.createBuffer({
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    size: bulletvertices.byteLength
+    size: enemyvertices.byteLength
 })
-device.queue.writeBuffer(bulletVertexBuffer, 0, bulletvertices);
+device.queue.writeBuffer(enemyVertexBuffer, 0, enemyvertices);
 
 
-// export const bulletXY = new Float32Array([0, 0]);
-export const bulletXYBuffer = device.createBuffer({
+// export const enemyXY = new Float32Array([0, 0]);
+export const enemyXYBuffer = device.createBuffer({
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    size: new Float32Array([0, 0]).byteLength * maxBullets
+    size: new Float32Array([0, 0]).byteLength
 })
 
-export const bulletBindGroup = device.createBindGroup({
-  layout: bulletsPipeline.getBindGroupLayout(0),
+export const enemyBindGroup = device.createBindGroup({
+  layout: enemysPipeline.getBindGroupLayout(0),
   entries: [{
     binding: 0,
     resource: {
-      buffer: bulletXYBuffer
+      buffer: enemyXYBuffer
     },
   }],
 });

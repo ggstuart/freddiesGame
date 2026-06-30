@@ -19,6 +19,8 @@ export const module = device.createShaderModule({
 
   @group(0) @binding(0) var<storage> player: Entity;
   @group(0) @binding(0) var<storage> bullets: array<Entity>;
+  @group(0) @binding(0) var<storage> enemys: array<Entity>;
+
 
   @vertex fn vsPlayer(input: VertexInput) -> VertexOutput {
     var output: VertexOutput;
@@ -34,6 +36,12 @@ export const module = device.createShaderModule({
     return output;
   }
 
+//   @vertex fn vsEnemy(input: VertexInput, @builtin(instance_index) instanceIndex: u32) -> VertexOutput {
+//     var output: VertexOutput;
+//     var newPosition = enemys[instanceIndex].xy + input.position;
+//     output.position = vec4f(newPosition, 0.1, 1.0);
+//     return output;
+  //}
 
   @fragment fn fs(input: VertexOutput) -> @location(0) vec4f {
     return vec4f(1, 0, 0, 1);
@@ -41,5 +49,9 @@ export const module = device.createShaderModule({
   @fragment fn fsBullet(input: VertexOutput) -> @location(0) vec4f {
     return vec4f(1, 1, 0, 1);
   }
+  @fragment fn fsEnemy(input: VertexOutput) -> @location(0) vec4f {
+    return vec4f(1, 1, 0, 1);
+  }
   `,
+
 });

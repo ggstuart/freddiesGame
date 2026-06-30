@@ -1,43 +1,48 @@
 import { device, format, context } from "./setup.js";
 import { module } from "./shader.js";
-
+import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer } from "./entities/enemy.js";
 import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./entities/player.js";
-import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXY, bulletXYBuffer } from "./entities/bullets.js";
+import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
 
-let x = 0;
-let y = -1;
-let left = false;
-let right = false;
+const player = {
+    x: 0,
+    y: -1,
+    left: false,
+    right: false
+}
+
+const enemy = {
+    x: 0,
+    y: 0.6,
+
+}
+
 let shoot = false;
 const speed = 0.02;
 const bulletSpeed = 0.0025;
 let bullets = [];
-
+let enemyArr = []
 
 window.addEventListener('keydown', ev => { 
-    if (ev.key == "a") left = true;
-    if (ev.key == "d") right = true;
-    // if (ev.key == " ") shoot = true;
+    if (ev.key == "a") player.left = true;
+    if (ev.key == "d") player.right = true;
 })
 
 window.addEventListener('keyup', ev => { 
-    if (ev.key == "a") left = false;
-    if (ev.key == "d") right = false;
-    // if (ev.key == " ") shoot = false;
+    if (ev.key == "a") player.left = false;
+    if (ev.key == "d") player.right = false;
 })
 window.addEventListener('click', ev => {
     if (bullets.length < maxBullets) { 
-        bullets.push([x, y+0.2]);
+        bullets.push([player.x, player.y+0.2]);
     }
 })
 
 function update() { 
-    x += (right - left) * speed;
-    // if (shoot && bullets.length < maxBullets) { 
-    //     bullets.push([x, y+0.2]);
-    // }
+    player.x += (player.right - player.left) * speed;
     bullets = bullets.filter(b => b[1] < 1).map(b => [b[0], b[1] + bulletSpeed]);
-    const playerXY = new Float32Array([x, y]);
+    enemyArr = enemyArr.map(b => b[1]  - enemySpeed * 2).map(b => [b[1] + enemySpeed, b[0]])
+    const playerXY = new Float32Array([player.x, player.y]);
     const bulletXY = new Float32Array(bullets.flat());
     device.queue.writeBuffer(bulletXYBuffer, 0, bulletXY);
     device.queue.writeBuffer(playerXYBuffer, 0, playerXY);
@@ -61,7 +66,7 @@ export function render() {
         ],
     });
 
-    // // bullets
+    // bullets
     if (bullets.length) {   
         
         pass.setPipeline(bulletsPipeline);
@@ -69,6 +74,10 @@ export function render() {
         pass.setBindGroup(0, bulletBindGroup);
         pass.draw(6, bullets.length);  // call our vertex shader 3 times
     }
+
+    // enemy
+
+
 
     // player
     pass.setPipeline(playerPipeline);
