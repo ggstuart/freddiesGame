@@ -1,7 +1,7 @@
 import { device, format, context } from "./setup.js";
 import { module } from "./shader.js";
 
-import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer } from "./player.js";
+import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./player.js";
 import { bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXY, bulletXYBuffer } from "./bullets.js";
 
 let x = 0;
@@ -10,28 +10,32 @@ let left = false;
 let right = false;
 let shoot = false;
 const speed = 0.02;
-const bulletSpeed = 0.01;
+const bulletSpeed = 0.0025;
 let bullets = [];
 const maxBullets = 50;
 
 window.addEventListener('keydown', ev => { 
     if (ev.key == "a") left = true;
     if (ev.key == "d") right = true;
-    if (ev.key == " ") shoot = true;
+    // if (ev.key == " ") shoot = true;
 })
 
 window.addEventListener('keyup', ev => { 
     if (ev.key == "a") left = false;
     if (ev.key == "d") right = false;
-    if (ev.key == " ") shoot = false;
+    // if (ev.key == " ") shoot = false;
 })
-
+window.addEventListener('click', ev => {
+    if (bullets.length < maxBullets) { 
+        bullets.push([x, y+0.2]);
+    }
+})
 
 function update() { 
     x += (right - left) * speed;
-    if (shoot && bullets.length < maxBullets) { 
-        bullets.push([x, y+0.2]);
-    }
+    // if (shoot && bullets.length < maxBullets) { 
+    //     bullets.push([x, y+0.2]);
+    // }
     bullets = bullets.filter(b => b[1] < 1).map(b => [b[0], b[1] + bulletSpeed]);
     const playerXY = new Float32Array([x, y]);
     const bulletXY = new Float32Array(bullets.flat());
@@ -64,14 +68,14 @@ export function render() {
         pass.setPipeline(bulletsPipeline);
         pass.setVertexBuffer(0, bulletVertexBuffer);
         pass.setBindGroup(0, bulletBindGroup);
-        pass.draw(3, bullets.length);  // call our vertex shader 3 times
+        pass.draw(6, bullets.length);  // call our vertex shader 3 times
     }
 
     // player
     pass.setPipeline(playerPipeline);
     pass.setVertexBuffer(0, playerVertexBuffer);
     pass.setBindGroup(0, playerBindGroup);
-    pass.draw(3);  // call our vertex shader 3 times
+    pass.draw(playerVertices.byteLength / 8);  // call our vertex shader 3 times
 
 
     pass.end();

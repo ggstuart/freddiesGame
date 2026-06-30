@@ -24,7 +24,14 @@ export const bulletsPipeline = device.createRenderPipeline({
 })
 
 
-let bulletvertices = new Float32Array([0.0, 0.01, -0.01, -0.01, 0.01, -0.01])
+let bulletvertices = new Float32Array([
+    0.0, 0.01,      // top middle
+    -0.01, -0.01,   // bottom left
+    0.01, -0.01,    // bottom right
+    0.0, -0.03,     // bottom middle
+    -0.01, -0.01,   // bottom left
+    0.01, -0.01     // bottom right
+])
 export const bulletVertexBuffer = device.createBuffer({
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     size: bulletvertices.byteLength

@@ -23,7 +23,7 @@ export const playerPipeline = device.createRenderPipeline({
      },
 })
 
-const playerVertices = new Float32Array([0.0, 0.2, -0.1, 0.0, 0.1, 0.0]);
+export const playerVertices = new Float32Array([0.0, 0.2, -0.1, 0.0, 0.1, 0.0]);
 export const playerVertexBuffer = device.createBuffer({
   usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
   size: playerVertices.byteLength
