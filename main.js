@@ -80,7 +80,7 @@ window.addEventListener('keyup', ev => {
 })
 window.addEventListener('click', ev => {
     if (bullets.length < maxBullets) { 
-        bullets.push([player.x, player.y+0.2]);
+        bullets.push([player.x, player.y]);
     }
 })
 
