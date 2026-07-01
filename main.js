@@ -12,11 +12,9 @@ class Enemy {
     }
 
     update(deltaTime) { 
-        if (this.x < -1) {
+        if (this.x < -1 || this.x > 1) {
             this.xSpeed *= -1;
-        }
-        if (this.x > 1) {
-            this.xSpeed *= -1;
+            //this.y -= 0.1
         }
 
         this.x += this.xSpeed * deltaTime;
@@ -39,11 +37,12 @@ function makeEntityData(x, y, color) {
     return [x, y, 0, 0, ...color];
 }
 
-function spawnEnemy() {
-    if (enemies.length < nEnemies ) {
-        enemies.push(randomEnemy());
-        
-    }
+function spawnEnemy() {  
+    enemies.push(randomEnemy());
+}
+
+function spawnWave(wave) {
+    enemies = Array.from({length: wave * 2d}, () => randomEnemy())
 }
 
 function isColliding(bullet, enemy) {
@@ -67,7 +66,8 @@ let shoot = false;
 const bulletSpeed = 2;
 const nEnemies = 50;
 let bullets = [];
-let enemies = Array.from({length: nEnemies}, () => randomEnemy())
+let enemies = [];// = Array.from({length: nEnemies}, () => randomEnemy())
+let wave = 0;
 
 window.addEventListener('keydown', ev => { 
     if (ev.key == "a") player.left = true;
@@ -86,12 +86,21 @@ window.addEventListener('click', ev => {
 
 function update(deltaTime) { 
     // console.log(deltaTime);
-    
+
+
+
     player.x += (player.right - player.left) * player.speed * deltaTime;
     const movedBullets = bullets
         .filter(b => b[1] < 1)
         .map(b => [b[0], b[1] + bulletSpeed * deltaTime]);
 
+    
+    if (enemies.length == 0) {
+        wave++;
+        spawnWave(wave);
+    }
+
+    
     enemies.forEach(e => {
         e.update(deltaTime, canvas);
         // e.x += e.xSpeed * deltaTime;
@@ -112,7 +121,7 @@ function update(deltaTime) {
         if (!hit) {
             survivingEnemies.push(enemy);
         } else {
-            maxEnemySpeed += 0.1;
+            maxEnemySpeed += 0.01;
         }
         
     }
@@ -120,9 +129,6 @@ function update(deltaTime) {
     bullets = survivingBullets;
     enemies = survivingEnemies;
 
-    if (enemies.length < nEnemies) {
-        spawnEnemy();
-    }
 
     const playerXY = new Float32Array(makeEntityData(player.x, player.y, [0.2, 0.2, 1, 1]));
     const bulletXY = new Float32Array(bullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])));
