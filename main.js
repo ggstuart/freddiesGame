@@ -42,7 +42,7 @@ function spawnEnemy() {
 }
 
 function spawnWave(wave) {
-    enemies = Array.from({length: wave * 2d}, () => randomEnemy())
+    enemies = Array.from({length: wave * 2}, () => randomEnemy())
 }
 
 function isColliding(bullet, enemy) {
