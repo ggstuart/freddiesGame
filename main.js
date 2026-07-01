@@ -1,4 +1,4 @@
-import { device, format, context, canvas } from "./setup.js";
+import { device, format, context, canvas, canvasBuffer } from "./setup.js";
 import { module } from "./shader.js";
 import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer } from "./entities/enemy.js";
 import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./entities/player.js";

@@ -1,4 +1,4 @@
-import { device, format } from "../setup.js";
+import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
 
 export const playerPipeline = device.createRenderPipeline({
@@ -53,10 +53,8 @@ device.queue.writeBuffer(playerXYBuffer, 0, playerXY);
 
 export const playerBindGroup = device.createBindGroup({
   layout: playerPipeline.getBindGroupLayout(0),
-  entries: [{
-    binding: 0,
-    resource: {
-      buffer: playerXYBuffer
-    },
-  }],
+    entries: [
+        { binding: 0, resource: { buffer: playerXYBuffer} },
+        { binding: 1, resource: { buffer: canvasBuffer } }
+    ],
 });

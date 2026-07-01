@@ -1,7 +1,7 @@
-import { device, format } from "../setup.js";
+import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
 
-export const maxBullets = 50;
+export const maxBullets = 3;
 
 export const bulletsPipeline = device.createRenderPipeline({
     label: "bullets pipeline",
@@ -48,11 +48,9 @@ export const bulletXYBuffer = device.createBuffer({
 })
 
 export const bulletBindGroup = device.createBindGroup({
-  layout: bulletsPipeline.getBindGroupLayout(0),
-  entries: [{
-    binding: 0,
-    resource: {
-      buffer: bulletXYBuffer
-    },
-  }],
+    layout: bulletsPipeline.getBindGroupLayout(0),
+    entries: [
+        { binding: 0, resource: { buffer: bulletXYBuffer } },
+        { binding: 1, resource: { buffer: canvasBuffer } }
+    ],
 });

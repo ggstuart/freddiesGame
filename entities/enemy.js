@@ -1,4 +1,4 @@
-import { device, format } from "../setup.js";
+import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
 
 export const maxEnemys = 50;
@@ -48,11 +48,9 @@ export const enemyXYBuffer = device.createBuffer({
 })
 
 export const enemyBindGroup = device.createBindGroup({
-  layout: enemysPipeline.getBindGroupLayout(0),
-  entries: [{
-    binding: 0,
-    resource: {
-      buffer: enemyXYBuffer
-    },
-  }],
+    layout: enemysPipeline.getBindGroupLayout(0),
+    entries: [
+        { binding: 0, resource: { buffer: enemyXYBuffer} },
+        { binding: 1, resource: { buffer: canvasBuffer } }
+    ],
 });
