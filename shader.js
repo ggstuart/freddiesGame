@@ -5,52 +5,32 @@ export const module = device.createShaderModule({
   code: /* wgsl */ `
 
   struct VertexInput {
-    @location(0) position: vec2<f32>
-  };
-
-  struct VertexOutput {
-    @builtin(position) position: vec4<f32>,
+    @location(0) position: vec2<f32>,
   };
 
   struct Entity {
     xy: vec2<f32>,
+    _pad: vec2<f32>,
+    color: vec4<f32>,
   };
 
+  struct VertexOutput {
+    @builtin(position) position: vec4<f32>,
+    @location(0) color: vec4<f32>,
+  };
 
-  @group(0) @binding(0) var<storage> player: Entity;
-  @group(0) @binding(0) var<storage> bullets: array<Entity>;
-  @group(0) @binding(0) var<storage> enemys: array<Entity>;
+  @group(0) @binding(0) var<storage> entities: array<Entity>;
 
-
-  @vertex fn vsPlayer(input: VertexInput) -> VertexOutput {
+  @vertex fn vsEntity(input: VertexInput, @builtin(instance_index) instanceIndex: u32) -> VertexOutput {
     var output: VertexOutput;
-    var newPosition = player.xy + input.position;
-    output.position = vec4f(newPosition, 0.1, 1.0);
+    let entity = entities[instanceIndex];
+    output.position = vec4f(entity.xy + input.position, 0.1, 1.0);
+    output.color = entity.color;
     return output;
   }
 
-  @vertex fn vsBullets(input: VertexInput, @builtin(instance_index) instanceIndex: u32) -> VertexOutput {
-    var output: VertexOutput;
-    var newPosition = bullets[instanceIndex].xy + input.position;
-    output.position = vec4f(newPosition, 0.1, 1.0);
-    return output;
-  }
-
-//   @vertex fn vsEnemy(input: VertexInput, @builtin(instance_index) instanceIndex: u32) -> VertexOutput {
-//     var output: VertexOutput;
-//     var newPosition = enemys[instanceIndex].xy + input.position;
-//     output.position = vec4f(newPosition, 0.1, 1.0);
-//     return output;
-  //}
-
-  @fragment fn fs(input: VertexOutput) -> @location(0) vec4f {
-    return vec4f(1, 0, 0, 1);
-  }
-  @fragment fn fsBullet(input: VertexOutput) -> @location(0) vec4f {
-    return vec4f(1, 1, 0, 1);
-  }
-  @fragment fn fsEnemy(input: VertexOutput) -> @location(0) vec4f {
-    return vec4f(1, 1, 0, 1);
+  @fragment fn fsEntity(input: VertexOutput) -> @location(0) vec4f {
+    return input.color;
   }
   `,
 

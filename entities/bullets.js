@@ -7,7 +7,7 @@ export const bulletsPipeline = device.createRenderPipeline({
     label: "bullets pipeline",
     layout: 'auto',
     vertex: {
-        entryPoint: 'vsBullets',
+        entryPoint: 'vsEntity',
         module,
         buffers: [
             {
@@ -19,7 +19,7 @@ export const bulletsPipeline = device.createRenderPipeline({
         ]
     },
     fragment: {
-        entryPoint: 'fsBullet',
+        entryPoint: 'fsEntity',
         module,
         targets: [{ format }],
      },
@@ -43,8 +43,8 @@ device.queue.writeBuffer(bulletVertexBuffer, 0, bulletvertices);
 
 // export const bulletXY = new Float32Array([0, 0]);
 export const bulletXYBuffer = device.createBuffer({
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    size: new Float32Array([0, 0]).byteLength * maxBullets
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    size: maxBullets * 8 * Float32Array.BYTES_PER_ELEMENT
 })
 
 export const bulletBindGroup = device.createBindGroup({

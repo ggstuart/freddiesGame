@@ -5,7 +5,7 @@ export const playerPipeline = device.createRenderPipeline({
     label: "player pipeline",
     layout: 'auto',
     vertex: {
-        entryPoint: 'vsPlayer',
+        entryPoint: 'vsEntity',
         module,
         buffers: [
             {
@@ -17,7 +17,7 @@ export const playerPipeline = device.createRenderPipeline({
         ]
     },
     fragment: {
-        entryPoint: 'fs',
+        entryPoint: 'fsEntity',
         module,
         targets: [{ format }],
      },
@@ -31,11 +31,12 @@ export const playerVertexBuffer = device.createBuffer({
 device.queue.writeBuffer(playerVertexBuffer, 0, playerVertices);
 
 
-export const playerXY = new Float32Array([0, 0]);
+export const playerXY = new Float32Array([0, 0, 1, 0, 0, 1, 0, 0]);
 export const playerXYBuffer = device.createBuffer({
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     size: playerXY.byteLength
 })
+device.queue.writeBuffer(playerXYBuffer, 0, playerXY);
 
 export const playerBindGroup = device.createBindGroup({
   layout: playerPipeline.getBindGroupLayout(0),

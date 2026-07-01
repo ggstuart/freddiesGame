@@ -7,7 +7,7 @@ export const enemysPipeline = device.createRenderPipeline({
     label: "enemys pipeline",
     layout: 'auto',
     vertex: {
-        entryPoint: 'vsEnemys',
+        entryPoint: 'vsEntity',
         module,
         buffers: [
             {
@@ -19,7 +19,7 @@ export const enemysPipeline = device.createRenderPipeline({
         ]
     },
     fragment: {
-        entryPoint: 'fsEnemy',
+        entryPoint: 'fsEntity',
         module,
         targets: [{ format }],
      },
@@ -36,15 +36,15 @@ let enemyvertices = new Float32Array([
 ])
 export const enemyVertexBuffer = device.createBuffer({
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    size: enemyvertices.byteLength
+    size: enemyvertices.byteLength * 3
 })
 device.queue.writeBuffer(enemyVertexBuffer, 0, enemyvertices);
 
 
 // export const enemyXY = new Float32Array([0, 0]);
 export const enemyXYBuffer = device.createBuffer({
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    size: new Float32Array([0, 0]).byteLength
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    size: maxEnemys * 8 * Float32Array.BYTES_PER_ELEMENT
 })
 
 export const enemyBindGroup = device.createBindGroup({
