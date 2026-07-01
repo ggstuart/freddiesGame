@@ -88,7 +88,6 @@ function update(deltaTime) {
     // console.log(deltaTime);
 
 
-
     player.x += (player.right - player.left) * player.speed * deltaTime;
     const movedBullets = bullets
         .filter(b => b[1] < 1)
@@ -100,10 +99,8 @@ function update(deltaTime) {
         spawnWave(wave);
     }
 
-    
     enemies.forEach(e => {
         e.update(deltaTime, canvas);
-        // e.x += e.xSpeed * deltaTime;
     })
 
     const survivingBullets = [];
@@ -128,7 +125,6 @@ function update(deltaTime) {
 
     bullets = survivingBullets;
     enemies = survivingEnemies;
-
 
     const playerXY = new Float32Array(makeEntityData(player.x, player.y, [0.2, 0.2, 1, 1]));
     const bulletXY = new Float32Array(bullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])));
@@ -162,8 +158,10 @@ export function render() {
         pass.setPipeline(bulletsPipeline);
         pass.setVertexBuffer(0, bulletVertexBuffer);
         pass.setBindGroup(0, bulletBindGroup);
-        pass.draw(6, bullets.length);  // call our vertex shader 3 times
+        pass.draw(6, bullets.length);
     }
+
+    //enemyBullets
 
     // enemy
     if (enemies.length) {
@@ -173,13 +171,11 @@ export function render() {
         pass.draw(6, enemies.length);
     }
 
-
     // player
     pass.setPipeline(playerPipeline);
     pass.setVertexBuffer(0, playerVertexBuffer);
     pass.setBindGroup(0, playerBindGroup);
     pass.draw(playerVertices.byteLength / 8, 1);
-
 
     pass.end();
 
