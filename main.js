@@ -5,18 +5,18 @@ import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXY
 import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
 
 class Enemy {
-    constructor(x, y) {
+    constructor(x, y, maxSpeed) {
         this.x = x;
         this.y = y;
-        this.xSpeed = 1;
+        this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
     }
 
     update(deltaTime) { 
         if (this.x < -1) {
-            this.xSpeed = 1;
+            this.xSpeed *= -1;
         }
         if (this.x > 1) {
-            this.xSpeed = -1;
+            this.xSpeed *= -1;
         }
 
         this.x += this.xSpeed * deltaTime;
@@ -28,7 +28,7 @@ function randomEnemy() {
     const x = Math.random() * 2 - 1;
     const y = Math.random() * 2 - 1;
     if (y > 0.15 ) {
-        return new Enemy(x, y);
+        return new Enemy(x, y, maxEnemySpeed);
     }
     else {
         return randomEnemy();
@@ -40,9 +40,9 @@ function makeEntityData(x, y, color) {
 }
 
 function spawnEnemy() {
-    if (enemies.length < nEnemies) {
+    if (enemies.length < nEnemies ) {
         enemies.push(randomEnemy());
-        aliveEnemyCount = enemies.length;
+        
     }
 }
 
@@ -62,12 +62,12 @@ const player = {
     speed: 1
 }
 
+let maxEnemySpeed = 1;
 let shoot = false;
 const bulletSpeed = 2;
-const nEnemies = 4;
+const nEnemies = 50;
 let bullets = [];
 let enemies = Array.from({length: nEnemies}, () => randomEnemy())
-let aliveEnemyCount = enemies.length;
 
 window.addEventListener('keydown', ev => { 
     if (ev.key == "a") player.left = true;
@@ -111,14 +111,16 @@ function update(deltaTime) {
         const hit = movedBullets.some(bullet => isColliding(bullet, enemy));
         if (!hit) {
             survivingEnemies.push(enemy);
+        } else {
+            maxEnemySpeed += 0.1;
         }
+        
     }
 
     bullets = survivingBullets;
     enemies = survivingEnemies;
-    aliveEnemyCount = enemies.length;
 
-    if (aliveEnemyCount < nEnemies) {
+    if (enemies.length < nEnemies) {
         spawnEnemy();
     }
 
