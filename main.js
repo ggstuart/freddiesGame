@@ -27,7 +27,7 @@ class Enemy {
 function randomEnemy() {
     const x = Math.random() * 2 - 1;
     const y = Math.random() * 2 - 1;
-    if (y > 0.15) {
+    if (y > 0.15 ) {
         return new Enemy(x, y);
     }
     else {
@@ -39,6 +39,21 @@ function makeEntityData(x, y, color) {
     return [x, y, 0, 0, ...color];
 }
 
+function spawnEnemy() {
+    if (enemies.length < nEnemies) {
+        enemies.push(randomEnemy());
+        aliveEnemyCount = enemies.length;
+    }
+}
+
+function isColliding(bullet, enemy) {
+    const dx = bullet[0] - enemy.x;
+    const dy = bullet[1] - enemy.y;
+    const bulletRadius = 0.02;
+    const enemyRadius = 0.03;
+    return Math.hypot(dx, dy) < bulletRadius + enemyRadius;
+}
+
 const player = {
     x: 0,
     y: -1,
@@ -47,17 +62,12 @@ const player = {
     speed: 1
 }
 
-
 let shoot = false;
 const bulletSpeed = 2;
-const nEnemies = 5;
+const nEnemies = 4;
 let bullets = [];
 let enemies = Array.from({length: nEnemies}, () => randomEnemy())
-let enemySpeed = 0
-let enemyHP = 1
-
-console.log(enemies);
-
+let aliveEnemyCount = enemies.length;
 
 window.addEventListener('keydown', ev => { 
     if (ev.key == "a") player.left = true;
@@ -78,11 +88,39 @@ function update(deltaTime) {
     // console.log(deltaTime);
     
     player.x += (player.right - player.left) * player.speed * deltaTime;
-    bullets = bullets.filter(b => b[1] < 1).map(b => [b[0], b[1] + bulletSpeed * deltaTime]);
+    const movedBullets = bullets
+        .filter(b => b[1] < 1)
+        .map(b => [b[0], b[1] + bulletSpeed * deltaTime]);
+
     enemies.forEach(e => {
         e.update(deltaTime, canvas);
         // e.x += e.xSpeed * deltaTime;
     })
+
+    const survivingBullets = [];
+    const survivingEnemies = [];
+
+    for (const bullet of movedBullets) {
+        const hit = enemies.some(enemy => isColliding(bullet, enemy));
+        if (!hit) {
+            survivingBullets.push(bullet);
+        }
+    }
+
+    for (const enemy of enemies) {
+        const hit = movedBullets.some(bullet => isColliding(bullet, enemy));
+        if (!hit) {
+            survivingEnemies.push(enemy);
+        }
+    }
+
+    bullets = survivingBullets;
+    enemies = survivingEnemies;
+    aliveEnemyCount = enemies.length;
+
+    if (aliveEnemyCount < nEnemies) {
+        spawnEnemy();
+    }
 
     const playerXY = new Float32Array(makeEntityData(player.x, player.y, [0.2, 0.2, 1, 1]));
     const bulletXY = new Float32Array(bullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])));
@@ -121,11 +159,10 @@ export function render() {
 
     // enemy
     if (enemies.length) {
-        
         pass.setPipeline(enemysPipeline);
         pass.setVertexBuffer(0, enemyVertexBuffer);
         pass.setBindGroup(0, enemyBindGroup);
-        pass.draw(6, enemies.length)
+        pass.draw(6, enemies.length);
     }
 
 
