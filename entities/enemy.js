@@ -27,12 +27,12 @@ export const enemysPipeline = device.createRenderPipeline({
 
 
 let enemyvertices = new Float32Array([
-    0.0, 0.01,      // top middle
-    -0.01, -0.01,   // bottom left
-    0.01, -0.01,    // bottom right
-    0.0, -0.03,     // bottom middle
-    -0.01, -0.01,   // bottom left
-    0.01, -0.01     // bottom right
+    0.05, 0.05,      // top middle
+    -0.05, 0.05,   // bottom left
+    0.05, -0.05,    // bottom right
+    0.05, -0.05,     // bottom middle
+    -0.05, -0.05,   // bottom left
+    -0.05, 0.05     // bottom right
 ])
 export const enemyVertexBuffer = device.createBuffer({
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,

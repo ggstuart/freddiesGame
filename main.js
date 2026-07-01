@@ -1,14 +1,38 @@
-import { device, format, context } from "./setup.js";
+import { device, format, context, canvas } from "./setup.js";
 import { module } from "./shader.js";
 import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer } from "./entities/enemy.js";
 import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./entities/player.js";
 import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
 
-function randomEnemy() {
-    return {
-        x: Math.random() * 2 - 1,
-        y: Math.random() * 2 - 1
+class Enemy {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.xSpeed = 1;
     }
+
+    update(deltaTime) { 
+        if (this.x < -1) {
+            this.xSpeed = 1;
+        }
+        if (this.x > 1) {
+            this.xSpeed = -1;
+        }
+
+        this.x += this.xSpeed * deltaTime;
+
+    }
+}
+
+function randomEnemy() {
+    const x = Math.random() * 2 - 1;
+    const y = Math.random() * 2 - 1;
+    if (y > 0.15) {
+        return new Enemy(x, y);
+    }
+    else {
+        return randomEnemy();
+   } 
 }
 
 function makeEntityData(x, y, color) {
@@ -55,6 +79,11 @@ function update(deltaTime) {
     
     player.x += (player.right - player.left) * player.speed * deltaTime;
     bullets = bullets.filter(b => b[1] < 1).map(b => [b[0], b[1] + bulletSpeed * deltaTime]);
+    enemies.forEach(e => {
+        e.update(deltaTime, canvas);
+        // e.x += e.xSpeed * deltaTime;
+    })
+
     const playerXY = new Float32Array(makeEntityData(player.x, player.y, [0.2, 0.2, 1, 1]));
     const bulletXY = new Float32Array(bullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])));
     const enemyXY = new Float32Array(enemies.flatMap(e => makeEntityData(e.x, e.y, [1, 0, 0, 1])));
