@@ -54,3 +54,28 @@ export const enemyBindGroup = device.createBindGroup({
         { binding: 1, resource: { buffer: canvasBuffer } }
     ],
 });
+
+
+export class Enemy {
+    constructor(x, y, maxSpeed) {
+        this.x = x;
+        this.y = y;
+        this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
+    }
+
+    update(deltaTime) { 
+        if (this.x < -1 || this.x > 1) {
+            this.xSpeed *= -1;
+            //this.y -= 0.1
+        }
+
+        this.x += this.xSpeed * deltaTime;
+
+    }
+}
+
+export function randomEnemy(maxEnemySpeed) {
+    const x = Math.random() * 2 - 1;
+    const y = 0.15 + Math.random() * 0.85;
+    return new Enemy(x, y, maxEnemySpeed);
+}

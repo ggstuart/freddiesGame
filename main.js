@@ -4,41 +4,13 @@ import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer } from
 import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./entities/player.js";
 import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
 
-class Enemy {
-    constructor(x, y, maxSpeed) {
-        this.x = x;
-        this.y = y;
-        this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
-    }
-
-    update(deltaTime) { 
-        if (this.x < -1 || this.x > 1) {
-            this.xSpeed *= -1;
-            //this.y -= 0.1
-        }
-
-        this.x += this.xSpeed * deltaTime;
-
-    }
-}
-
-function randomEnemy() {
-    const x = Math.random() * 2 - 1;
-    const y = Math.random() * 2 - 1;
-    if (y > 0.15 ) {
-        return new Enemy(x, y, maxEnemySpeed);
-    }
-    else {
-        return randomEnemy();
-   } 
-}
 
 function makeEntityData(x, y, color) {
     return [x, y, 0, 0, ...color];
 }
 
 function spawnEnemy() {  
-    enemies.push(randomEnemy());
+    enemies.push(randomEnemy(maxEnemySpeed));
 }
 
 function spawnWave(wave) {
