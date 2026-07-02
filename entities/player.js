@@ -1,11 +1,11 @@
-import { device, format } from "../setup.js";
+import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
 
 export const playerPipeline = device.createRenderPipeline({
     label: "player pipeline",
     layout: 'auto',
     vertex: {
-        entryPoint: 'vsPlayer',
+        entryPoint: 'vsEntity',
         module,
         buffers: [
             {
@@ -17,13 +17,26 @@ export const playerPipeline = device.createRenderPipeline({
         ]
     },
     fragment: {
-        entryPoint: 'fs',
+        entryPoint: 'fsEntity',
         module,
         targets: [{ format }],
      },
 })
 
-export const playerVertices = new Float32Array([0.0, 0.2, -0.1, 0.0, 0.1, 0.0]);
+export const playerVertices = new Float32Array([
+  0.0, 0.075,
+  -0.1, 0.0,
+  0.1, 0.0,
+  0.1, 0.0,
+  0.05 , 0.125,
+  0.0, 0.075,
+  -0.1, 0.0,
+  -0.05 , 0.125,
+  0.0, 0.075
+
+
+
+]);
 export const playerVertexBuffer = device.createBuffer({
   usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
   size: playerVertices.byteLength
@@ -31,18 +44,17 @@ export const playerVertexBuffer = device.createBuffer({
 device.queue.writeBuffer(playerVertexBuffer, 0, playerVertices);
 
 
-export const playerXY = new Float32Array([0, 0]);
+export const playerXY = new Float32Array([0, 0, 1, 0, 0, 1, 0, 0]);
 export const playerXYBuffer = device.createBuffer({
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     size: playerXY.byteLength
 })
+device.queue.writeBuffer(playerXYBuffer, 0, playerXY);
 
 export const playerBindGroup = device.createBindGroup({
   layout: playerPipeline.getBindGroupLayout(0),
-  entries: [{
-    binding: 0,
-    resource: {
-      buffer: playerXYBuffer
-    },
-  }],
+    entries: [
+        { binding: 0, resource: { buffer: playerXYBuffer} },
+        { binding: 1, resource: { buffer: canvasBuffer } }
+    ],
 });

@@ -1,10 +1,10 @@
 import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
 
-export const maxBullets = 3;
+export const maxEnemyBullets = 50;
 
-export const bulletsPipeline = device.createRenderPipeline({
-    label: "bullets pipeline",
+export const enemyBulletsPipeline = device.createRenderPipeline({
+    label: "enemyBullets pipeline",
     layout: 'auto',
     vertex: {
         entryPoint: 'vsEntity',
@@ -26,7 +26,7 @@ export const bulletsPipeline = device.createRenderPipeline({
 })
 
 
-let bulletvertices = new Float32Array([
+let enemyBulletvertices = new Float32Array([
     0.0, 0.01,      // top middle
     -0.01, -0.01,   // bottom left
     0.01, -0.01,    // bottom right
@@ -34,23 +34,23 @@ let bulletvertices = new Float32Array([
     -0.01, -0.01,   // bottom left
     0.01, -0.01     // bottom right
 ])
-export const bulletVertexBuffer = device.createBuffer({
+export const enemyBulletVertexBuffer = device.createBuffer({
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    size: bulletvertices.byteLength
+    size: enemyBulletvertices.byteLength
 })
-device.queue.writeBuffer(bulletVertexBuffer, 0, bulletvertices);
+device.queue.writeBuffer(enemyBulletVertexBuffer, 0, enemyBulletvertices);
 
 
-// export const bulletXY = new Float32Array([0, 0]);
-export const bulletXYBuffer = device.createBuffer({
+// export const enemyBulletXY = new Float32Array([0, 0]);
+export const enemyBulletXYBuffer = device.createBuffer({
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    size: maxBullets * 8 * Float32Array.BYTES_PER_ELEMENT
+    size: maxenemyBullets * 8 * Float32Array.BYTES_PER_ELEMENT
 })
 
-export const bulletBindGroup = device.createBindGroup({
-    layout: bulletsPipeline.getBindGroupLayout(0),
+export const enemyBulletBindGroup = device.createBindGroup({
+  layout: enemyBulletsPipeline.getBindGroupLayout(0),
     entries: [
-        { binding: 0, resource: { buffer: bulletXYBuffer } },
+        { binding: 0, resource: { buffer: enemyBulletXYBuffer} },
         { binding: 1, resource: { buffer: canvasBuffer } }
     ],
 });
