@@ -63,13 +63,13 @@ let enemies = [];// = Array.from({length: nEnemies}, () => randomEnemy())
 let wave = 0;
 
 window.addEventListener('keydown', ev => { 
-    if (ev.key == "a") player.left = true;
-    if (ev.key == "d") player.right = true;
+    if (ev.key.toLowerCase() == "a") player.left = true;
+    if (ev.key.toLowerCase() == "d") player.right = true;
 })
 
 window.addEventListener('keyup', ev => { 
-    if (ev.key == "a") player.left = false;
-    if (ev.key == "d") player.right = false;
+    if (ev.key.toLowerCase() == "a") player.left = false;
+    if (ev.key.toLowerCase() == "d") player.right = false;
 })
 window.addEventListener('click', ev => {
     if (bullets.length < maxBullets) { 
