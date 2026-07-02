@@ -61,7 +61,7 @@ export const playerBindGroup = device.createBindGroup({
 });
 
 export class Player {
-    constructor(shootCooldown = 0.2) { 
+    constructor(shootCooldown = 0.5) { 
         this.x = 0;
         this.y = -1;
         this.left = false;
@@ -78,8 +78,8 @@ export class Player {
         this.x += (this.right - this.left) * this.speed * deltaTime;
     
         //PAC-MAN
-        if (1 < this.x || this.x < -1) {
-            this.x *= -1
+        if (1 <= this.x || this.x <= -1) {
+            this.x *= -0.99
         }
         this.timeToShoot -= deltaTime;
     }

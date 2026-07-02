@@ -8,6 +8,7 @@ function gameOver() {
     enemies = []
     wave = 0
     maxEnemySpeed = 1
+    player.x = 0
 }
 
 function makeEntityData(x, y, color) {
@@ -50,7 +51,7 @@ window.addEventListener('keyup', ev => {
 })
 window.addEventListener('click', ev => {
     if (bullets.length < maxBullets && player.readyToShoot) { 
-        bullets.push(player.spawnBullet());
+        bullets.push(player.spawnBullet());a
     }
 })
 
@@ -63,9 +64,6 @@ function update(deltaTime) {
         console.log(wave);
         spawnWave(wave);
     }
-
-    
-    // enemy.update
 
     bullets.forEach(bullet => bullet.update(deltaTime));
     bullets = bullets.filter(bullet => {
@@ -162,7 +160,8 @@ export function render() {
 
 let p;
 function frame(ts) { 
-    const deltaTime = ts - p || 0; 
+    // const deltaTime = ts - p || 0; 
+    const deltaTime = Math.max(ts - p || 0, 1 / 30); 
     p = ts;
     update(deltaTime / 1000);
     render();

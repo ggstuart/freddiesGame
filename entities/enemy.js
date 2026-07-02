@@ -64,19 +64,36 @@ export class Enemy {
         this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
         this.alive = true;
         this.bulletSpeed = -1;
-        this.radius = 0.03;
+        this.radius = 0.025;
         this.shootCooldown = shootCooldown;
         this.timeToShoot = this.shootCooldown * Math.random();
     }
 
+    get leftEdge() { 
+        return this.x - this.radius;
+    }
+    set leftEdge(newValue) {
+        this.x = newValue + this.radius;
+    }
+
+    get rightEdge() { 
+        return this.x + this.radius;
+    }
+    set rightEdge(newValue) {
+        this.x = newValue - this.radius;
+    }
+
     update(deltaTime) { 
-        if (this.x < -1 || this.x > 1) {
+        const hitLeft = this.leftEdge < -1;
+        const hitRight = this.rightEdge > 1;
+        if (hitLeft || hitRight) {
             this.xSpeed *= -1;
-            this.y -= 0.1
+            this.y -= this.radius * 2;
         }
+        if (hitLeft) this.leftEdge = -1;
+        if (hitRight) this.rightEdge = 1;
         this.timeToShoot -= deltaTime;
         this.x += this.xSpeed * deltaTime;
-
     }
 
     spawnBullet() {
