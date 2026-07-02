@@ -9,10 +9,18 @@ function gameOver() {
     wave = 0
     maxEnemySpeed = 1
     player.x = 0
+    updateWaveDisplay();
 }
 
 function makeEntityData(x, y, color) {
     return [x, y, 0, 0, ...color];
+}
+
+function updateWaveDisplay() {
+    const waveIndicator = document.getElementById('wave-indicator');
+    if (waveIndicator) {
+        waveIndicator.textContent = `Wave ${wave}`;
+    }
 }
 
 function spawnEnemy() {  
@@ -39,6 +47,7 @@ let bullets = [];
 //let enemyBullets = [];
 let enemies = [];// = Array.from({length: nEnemies}, () => randomEnemy())
 let wave = 0;
+updateWaveDisplay();
 
 window.addEventListener('keydown', ev => { 
     if (ev.key.toLowerCase() == "a") player.left = true;
@@ -62,6 +71,7 @@ function update(deltaTime) {
     if (enemies.length == 0) {
         wave++;
         console.log(wave);
+        updateWaveDisplay();
         spawnWave(wave);
     }
 
@@ -143,7 +153,7 @@ export function render() {
         pass.setPipeline(enemysPipeline);
         pass.setVertexBuffer(0, enemyVertexBuffer);
         pass.setBindGroup(0, enemyBindGroup);
-        pass.draw(6, enemies.length);
+        pass.draw(9, enemies.length);
     }
 
     // player

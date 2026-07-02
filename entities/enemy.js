@@ -27,19 +27,23 @@ export const enemysPipeline = device.createRenderPipeline({
 })
 
 
-let enemyvertices = new Float32Array([
-    0.05, 0.05,      // top middle
-    -0.05, 0.05,   // bottom left
-    0.05, -0.05,    // bottom right
-    0.05, -0.05,     // bottom middle
-    -0.05, -0.05,   // bottom left
-    -0.05, 0.05     // bottom right
-])
+const enemyVertices = new Float32Array([
+    -0.025, 0.05,
+    0.025, 0.05,
+    0.0, 0.1,
+    -0.05, 0.0,
+    -0.025, 0.05,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.05, 0.0,
+    0.025, 0.05,
+]);
+
 export const enemyVertexBuffer = device.createBuffer({
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    size: enemyvertices.byteLength * 3
-})
-device.queue.writeBuffer(enemyVertexBuffer, 0, enemyvertices);
+    size: enemyVertices.byteLength,
+});
+device.queue.writeBuffer(enemyVertexBuffer, 0, enemyVertices);
 
 
 // export const enemyXY = new Float32Array([0, 0]);
