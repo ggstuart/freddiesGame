@@ -64,6 +64,7 @@ export class Enemy {
         this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
         this.alive = true;
         this.bulletSpeed = -1;
+        this.radius = 0.03;
         this.shootCooldown = shootCooldown;
         this.timeToShoot = this.shootCooldown * Math.random();
     }
@@ -71,6 +72,7 @@ export class Enemy {
     update(deltaTime) { 
         if (this.x < -1 || this.x > 1) {
             this.xSpeed *= -1;
+            this.y -= 0.1
         }
         this.timeToShoot -= deltaTime;
         this.x += this.xSpeed * deltaTime;

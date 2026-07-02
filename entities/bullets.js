@@ -61,6 +61,7 @@ export class Bullet {
         this.x = x;
         this.y = y;
         this.ySpeed = ySpeed;
+        this.radius = 0.02;
         this.alive = true;
     }
 

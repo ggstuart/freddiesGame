@@ -61,14 +61,17 @@ export const playerBindGroup = device.createBindGroup({
 });
 
 export class Player {
-    constructor() { 
+    constructor(shootCooldown = 0.2) { 
         this.x = 0;
         this.y = -1;
         this.left = false;
         this.right = false;
         this.shoot = false;
+        this.radius = 0.035
         this.speed = 1;
         this.bulletSpeed = 2;
+        this.shootCooldown = shootCooldown;
+        this.timeToShoot = this.shootCooldown * Math.random();
     }
 
     update(deltaTime) { 
@@ -78,11 +81,16 @@ export class Player {
         if (1 < this.x || this.x < -1) {
             this.x *= -1
         }
-
+        this.timeToShoot -= deltaTime;
     }
 
+
     spawnBullet() { 
+        this.timeToShoot = this.shootCooldown;
         return new Bullet(this.x, this.y, this.bulletSpeed);
     }
 
+    get readyToShoot() { 
+        return this.timeToShoot <= 0;
+    }
 }
