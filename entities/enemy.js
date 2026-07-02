@@ -61,6 +61,7 @@ export class Enemy {
         this.x = x;
         this.y = y;
         this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
+        this.alive = true;
     }
 
     update(deltaTime) { 
@@ -72,6 +73,10 @@ export class Enemy {
         this.x += this.xSpeed * deltaTime;
 
     }
+
+    // get alive() { 
+    //     return health > 0;
+    // }
 }
 
 export function randomEnemy(maxEnemySpeed) {

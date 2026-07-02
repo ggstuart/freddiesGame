@@ -1,7 +1,7 @@
 import { device, format, context, canvas, canvasBuffer } from "./setup.js";
 import { module } from "./shader.js";
-import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer } from "./entities/enemy.js";
-import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices } from "./entities/player.js";
+import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer, randomEnemy } from "./entities/enemy.js";
+import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices, Player } from "./entities/player.js";
 import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
 
 
@@ -12,14 +12,15 @@ function makeEntityData(x, y, color) {
 function spawnEnemy() {  
     enemies.push(randomEnemy(maxEnemySpeed));
 }
+// setInterval(spawnEnemy, 5000);
 
 function spawnWave(wave) {
-    enemies = Array.from({length: wave * 2}, () => randomEnemy())
+    enemies = Array.from({length: wave * 2}, () => randomEnemy(maxEnemySpeed))
 }
 
 function isColliding(bullet, enemy) {
-    const dx = bullet[0] - enemy.x;
-    const dy = bullet[1] - enemy.y;
+    const dx = bullet.x - enemy.x;
+    const dy = bullet.y - enemy.y;
     const bulletRadius = 0.02;
     const enemyRadius = 0.03;
     return Math.hypot(dx, dy) < bulletRadius + enemyRadius;
@@ -28,9 +29,9 @@ function isColliding(bullet, enemy) {
 const player = new Player();
 
 let maxEnemySpeed = 1;
-const bulletSpeed = 2;
 const nEnemies = 50;
 let bullets = [];
+let enemyBullets = [];
 let enemies = [];// = Array.from({length: nEnemies}, () => randomEnemy())
 let wave = 0;
 
@@ -45,54 +46,51 @@ window.addEventListener('keyup', ev => {
 })
 window.addEventListener('click', ev => {
     if (bullets.length < maxBullets) { 
-        bullets.push([player.x, player.y]);
+        bullets.push(player.spawnBullet());
     }
 })
+
 
 function update(deltaTime) { 
     // console.log(deltaTime);
 
     player.update(deltaTime);
-
-    const movedBullets = bullets
-        .filter(b => b[1] < 1)
-        .map(b => [b[0], b[1] + bulletSpeed * deltaTime]);
-
-    
     if (enemies.length == 0) {
         wave++;
+        console.log(wave);
         spawnWave(wave);
     }
 
-    enemies.forEach(e => {
-        e.update(deltaTime, canvas);
+    bullets.forEach(bullet => bullet.update(deltaTime));
+    bullets = bullets.filter(bullet => {
+        return bullet.y < 1 && bullet.y > -1
+    });        
+
+    enemies.forEach(enemy => {
+        enemy.update(deltaTime, canvas);
     })
 
-    const survivingBullets = [];
-    const survivingEnemies = [];
+    // collision
+    for (const bullet of bullets) {
+        for (const enemy of enemies) { 
+            if (isColliding(bullet, enemy)) {
+                console.log(bullet, enemy);
+                
+                bullet.alive = false;
+                enemy.alive = false;
+                maxEnemySpeed += 0.01;
 
-    for (const bullet of movedBullets) {
-        const hit = enemies.some(enemy => isColliding(bullet, enemy));
-        if (!hit) {
-            survivingBullets.push(bullet);
+                //score?
+                //health?
+            }
         }
     }
-
-    for (const enemy of enemies) {
-        const hit = movedBullets.some(bullet => isColliding(bullet, enemy));
-        if (!hit) {
-            survivingEnemies.push(enemy);
-        } else {
-            maxEnemySpeed += 0.01;
-        }
-        
-    }
-
-    bullets = survivingBullets;
-    enemies = survivingEnemies;
+    bullets = bullets.filter(bullet => bullet.alive);   
+    enemies = enemies.filter(enemy => enemy.alive);   
 
     const playerXY = new Float32Array(makeEntityData(player.x, player.y, [0.2, 0.2, 1, 1]));
-    const bulletXY = new Float32Array(bullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])));
+    const bulletXY = new Float32Array(bullets.flatMap((b) => makeEntityData(b.x, b.y, [1, 1, 0, 1])));
+    const enemyBulletXY = new Float32Array(enemyBullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])))
     const enemyXY = new Float32Array(enemies.flatMap(e => makeEntityData(e.x, e.y, [1, 0, 0, 1])));
     device.queue.writeBuffer(bulletXYBuffer, 0, bulletXY);
     device.queue.writeBuffer(playerXYBuffer, 0, playerXY);

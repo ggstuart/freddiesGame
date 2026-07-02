@@ -1,5 +1,6 @@
 import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
+import { Bullet } from "./bullets.js";
 
 export const playerPipeline = device.createRenderPipeline({
     label: "player pipeline",
@@ -67,6 +68,7 @@ export class Player {
         this.right = false;
         this.shoot = false;
         this.speed = 1;
+        this.bulletSpeed = 2;
     }
 
     update(deltaTime) { 
@@ -77,5 +79,9 @@ export class Player {
             this.x *= -1
         }
 
+    }
+
+    spawnBullet() { 
+        return new Bullet(this.x, this.y, this.bulletSpeed);
     }
 }

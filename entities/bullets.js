@@ -54,3 +54,17 @@ export const bulletBindGroup = device.createBindGroup({
         { binding: 1, resource: { buffer: canvasBuffer } }
     ],
 });
+
+
+export class Bullet {
+    constructor(x, y, ySpeed) {
+        this.x = x;
+        this.y = y;
+        this.ySpeed = ySpeed;
+        this.alive = true;
+    }
+
+    update(deltaTime) { 
+        this.y += this.ySpeed * deltaTime;
+    }
+}
