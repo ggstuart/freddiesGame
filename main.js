@@ -53,16 +53,9 @@ function isColliding(bullet, enemy) {
     return Math.hypot(dx, dy) < bulletRadius + enemyRadius;
 }
 
-const player = {
-    x: 0,
-    y: -1,
-    left: false,
-    right: false,
-    speed: 1
-}
+const player = new Player();
 
 let maxEnemySpeed = 1;
-let shoot = false;
 const bulletSpeed = 2;
 const nEnemies = 50;
 let bullets = [];
@@ -87,8 +80,8 @@ window.addEventListener('click', ev => {
 function update(deltaTime) { 
     // console.log(deltaTime);
 
+    player.update(deltaTime);
 
-    player.x += (player.right - player.left) * player.speed * deltaTime;
     const movedBullets = bullets
         .filter(b => b[1] < 1)
         .map(b => [b[0], b[1] + bulletSpeed * deltaTime]);

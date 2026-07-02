@@ -58,3 +58,24 @@ export const playerBindGroup = device.createBindGroup({
         { binding: 1, resource: { buffer: canvasBuffer } }
     ],
 });
+
+export class Player {
+    constructor() { 
+        this.x = 0;
+        this.y = -1;
+        this.left = false;
+        this.right = false;
+        this.shoot = false;
+        this.speed = 1;
+    }
+
+    update(deltaTime) { 
+        this.x += (this.right - this.left) * this.speed * deltaTime;
+    
+        //PAC-MAN
+        if (1 < this.x || this.x < -1) {
+            this.x *= -1
+        }
+
+    }
+}
