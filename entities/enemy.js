@@ -1,7 +1,8 @@
 import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
+import { Bullet } from "./bullets.js";
 
-export const maxEnemys = 50;
+export const maxEnemys = 150;
 
 export const enemysPipeline = device.createRenderPipeline({
     label: "enemys pipeline",
@@ -57,22 +58,34 @@ export const enemyBindGroup = device.createBindGroup({
 
 
 export class Enemy {
-    constructor(x, y, maxSpeed) {
+    constructor(x, y, maxSpeed, shootCooldown=2) {
         this.x = x;
         this.y = y;
         this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
         this.alive = true;
+        this.bulletSpeed = -1;
+        this.shootCooldown = shootCooldown;
+        this.timeToShoot = this.shootCooldown * Math.random();
     }
 
     update(deltaTime) { 
         if (this.x < -1 || this.x > 1) {
             this.xSpeed *= -1;
-            //this.y -= 0.1
         }
-
+        this.timeToShoot -= deltaTime;
         this.x += this.xSpeed * deltaTime;
 
     }
+
+    spawnBullet() {
+        this.timeToShoot = this.shootCooldown;
+        return new Bullet(this.x, this.y, this.bulletSpeed);
+    }
+
+    get readyToShoot() { 
+        return this.timeToShoot <= 0;
+    }
+
 
     // get alive() { 
     //     return health > 0;
@@ -83,4 +96,5 @@ export function randomEnemy(maxEnemySpeed) {
     const x = Math.random() * 2 - 1;
     const y = 0.15 + Math.random() * 0.85;
     return new Enemy(x, y, maxEnemySpeed);
+
 }

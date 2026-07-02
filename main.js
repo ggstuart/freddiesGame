@@ -1,6 +1,6 @@
 import { device, format, context, canvas, canvasBuffer } from "./setup.js";
 import { module } from "./shader.js";
-import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer, randomEnemy } from "./entities/enemy.js";
+import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer, randomEnemy, Enemy } from "./entities/enemy.js";
 import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices, Player } from "./entities/player.js";
 import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
 
@@ -12,10 +12,10 @@ function makeEntityData(x, y, color) {
 function spawnEnemy() {  
     enemies.push(randomEnemy(maxEnemySpeed));
 }
-// setInterval(spawnEnemy, 5000);
 
+let int;
 function spawnWave(wave) {
-    enemies = Array.from({length: wave * 2}, () => randomEnemy(maxEnemySpeed))
+    enemies = Array.from({ length: wave * 2 }, () => randomEnemy(maxEnemySpeed))
 }
 
 function isColliding(bullet, enemy) {
@@ -27,11 +27,12 @@ function isColliding(bullet, enemy) {
 }
 
 const player = new Player();
+// const enemy = new Enemy();
 
 let maxEnemySpeed = 1;
 const nEnemies = 50;
 let bullets = [];
-let enemyBullets = [];
+//let enemyBullets = [];
 let enemies = [];// = Array.from({length: nEnemies}, () => randomEnemy())
 let wave = 0;
 
@@ -50,7 +51,6 @@ window.addEventListener('click', ev => {
     }
 })
 
-
 function update(deltaTime) { 
     // console.log(deltaTime);
 
@@ -61,6 +61,8 @@ function update(deltaTime) {
         spawnWave(wave);
     }
 
+    // enemy.update
+
     bullets.forEach(bullet => bullet.update(deltaTime));
     bullets = bullets.filter(bullet => {
         return bullet.y < 1 && bullet.y > -1
@@ -68,12 +70,15 @@ function update(deltaTime) {
 
     enemies.forEach(enemy => {
         enemy.update(deltaTime, canvas);
+        if (enemy.readyToShoot) {
+            bullets.push(enemy.spawnBullet());
+        }
     })
 
     // collision
     for (const bullet of bullets) {
         for (const enemy of enemies) { 
-            if (isColliding(bullet, enemy)) {
+            if (isColliding(bullet, enemy) && bullet.ySpeed > 0) {
                 console.log(bullet, enemy);
                 
                 bullet.alive = false;
@@ -90,7 +95,7 @@ function update(deltaTime) {
 
     const playerXY = new Float32Array(makeEntityData(player.x, player.y, [0.2, 0.2, 1, 1]));
     const bulletXY = new Float32Array(bullets.flatMap((b) => makeEntityData(b.x, b.y, [1, 1, 0, 1])));
-    const enemyBulletXY = new Float32Array(enemyBullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])))
+    //const enemyBulletXY = new Float32Array(enemyBullets.flatMap(([x, y]) => makeEntityData(x, y, [1, 1, 0, 1])))
     const enemyXY = new Float32Array(enemies.flatMap(e => makeEntityData(e.x, e.y, [1, 0, 0, 1])));
     device.queue.writeBuffer(bulletXYBuffer, 0, bulletXY);
     device.queue.writeBuffer(playerXYBuffer, 0, playerXY);

@@ -1,7 +1,7 @@
 import { canvasBuffer, device, format } from "../setup.js";
 import { module } from "../shader.js";
 
-export const maxBullets = 3;
+export const maxBullets = 3000;
 
 export const bulletsPipeline = device.createRenderPipeline({
     label: "bullets pipeline",

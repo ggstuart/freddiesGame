@@ -84,4 +84,5 @@ export class Player {
     spawnBullet() { 
         return new Bullet(this.x, this.y, this.bulletSpeed);
     }
+
 }
