@@ -1,11 +1,14 @@
 import { device, format, context, canvas, canvasBuffer } from "./setup.js";
 import { module } from "./shader.js";
-import { enemysPipeline, enemyBindGroup, enemyVertexBuffer, enemyXYBuffer, randomEnemy, Enemy } from "./entities/enemy.js";
-import { playerPipeline, playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices, Player } from "./entities/player.js";
-import { maxBullets, bulletsPipeline, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
+import { enemyBindGroup, enemyVertexBuffer, enemyXYBuffer, randomEnemy, Enemy } from "./entities/enemy.js";
+import { playerVertexBuffer, playerBindGroup, playerXY, playerXYBuffer, playerVertices, Player } from "./entities/player.js";
+import { maxBullets, bulletVertexBuffer, bulletBindGroup, bulletXYBuffer } from "./entities/bullets.js";
+import { pipeline } from "./pipeline.js";
+import { bossBindGroup, bossSpawner, bossVertexBuffer, bossXYBuffer } from "./entities/boss.js";
 
 function gameOver() {
     enemies = []
+    bosses = []
     wave = 0
     maxEnemySpeed = 1
     player.x = 0
@@ -29,7 +32,16 @@ function spawnEnemy() {
 
 let int;
 function spawnWave(wave) {
-    enemies = Array.from({ length: wave * 2 }, () => randomEnemy(maxEnemySpeed))
+    bullets = [];
+    if (wave % 5 == 0) {
+        console.log("spawning boss");
+        
+        bosses = Array.from({length: wave / 5}, () => bossSpawner())
+    } else {
+        console.log("spawning enemies");
+
+        enemies = Array.from({ length: wave * 2 }, () => randomEnemy(maxEnemySpeed))        
+    }
 }
 
 function isColliding(object1, object2) {
@@ -39,15 +51,14 @@ function isColliding(object1, object2) {
 }
 
 const player = new Player();
-// const enemy = new Enemy();
 
 let maxEnemySpeed = 1;
-const nEnemies = 50;
 let bullets = [];
-//let enemyBullets = [];
-let enemies = [];// = Array.from({length: nEnemies}, () => randomEnemy())
+let enemies = [];
+let bosses = []
 let wave = 0;
 updateWaveDisplay();
+// gameOver();
 
 window.addEventListener('keydown', ev => { 
     if (ev.key.toLowerCase() == "a") player.left = true;
@@ -60,7 +71,7 @@ window.addEventListener('keyup', ev => {
 })
 window.addEventListener('click', ev => {
     if (bullets.length < maxBullets && player.readyToShoot) { 
-        bullets.push(player.spawnBullet());a
+        bullets.push(player.spawnBullet());
     }
 })
 
@@ -68,7 +79,7 @@ function update(deltaTime) {
     // console.log(deltaTime);
 
     player.update(deltaTime);
-    if (enemies.length == 0) {
+    if (enemies.length == 0 && bosses.length == 0) {
         wave++;
         console.log(wave);
         updateWaveDisplay();
@@ -90,6 +101,16 @@ function update(deltaTime) {
         }
     })
 
+    bosses.forEach(boss => {
+        boss.update(deltaTime, canvas);
+        if (boss.y < -1) {
+            gameOver()
+        }
+        if (boss.readyToShoot) {
+            bullets.push(boss.spawnBullet());
+        }
+    })
+
     // collision
     for (const bullet of bullets) {
         if (isColliding(bullet, player) && bullet.ySpeed < 0) {
@@ -107,16 +128,25 @@ function update(deltaTime) {
                 //health?
             }
         }
+        for (const boss of bosses) { 
+            if (isColliding(bullet, boss) && bullet.ySpeed > 0) {               
+                bullet.alive = false;
+                boss.HP -= 1;
+            }
+        }
     }
     bullets = bullets.filter(bullet => bullet.alive);   
     enemies = enemies.filter(enemy => enemy.alive);   
+    bosses = bosses.filter(boss => boss.alive);   
 
     const playerXY = new Float32Array(makeEntityData(player.x, player.y, [0.2, 0.2, 1, 1]));
     const bulletXY = new Float32Array(bullets.flatMap((b) => makeEntityData(b.x, b.y, [1, 1, 0, 1])));
     const enemyXY = new Float32Array(enemies.flatMap(e => makeEntityData(e.x, e.y, [1, 0, 0, 1])));
+    const bossXY = new Float32Array(bosses.flatMap(e => makeEntityData(e.x, e.y, [0.7, 0.1, 0.25, 1])));
     device.queue.writeBuffer(bulletXYBuffer, 0, bulletXY);
     device.queue.writeBuffer(playerXYBuffer, 0, playerXY);
     device.queue.writeBuffer(enemyXYBuffer, 0, enemyXY);
+    device.queue.writeBuffer(bossXYBuffer, 0, bossXY);
 }
 
 export function render() {
@@ -138,26 +168,31 @@ export function render() {
     });
 
     // bullets
-    if (bullets.length) {   
-        
-        pass.setPipeline(bulletsPipeline);
+    if (bullets.length) {           
+        pass.setPipeline(pipeline);
         pass.setVertexBuffer(0, bulletVertexBuffer);
         pass.setBindGroup(0, bulletBindGroup);
         pass.draw(6, bullets.length);
     }
 
-    //enemyBullets
+    //boss
+    if (bosses.length) {
+        pass.setPipeline(pipeline);
+        pass.setVertexBuffer(0, bossVertexBuffer);
+        pass.setBindGroup(0, bossBindGroup);
+        pass.draw(9, bosses.length);
+    }    
 
     // enemy
     if (enemies.length) {
-        pass.setPipeline(enemysPipeline);
+        pass.setPipeline(pipeline);
         pass.setVertexBuffer(0, enemyVertexBuffer);
         pass.setBindGroup(0, enemyBindGroup);
         pass.draw(9, enemies.length);
     }
 
     // player
-    pass.setPipeline(playerPipeline);
+    pass.setPipeline(pipeline);
     pass.setVertexBuffer(0, playerVertexBuffer);
     pass.setBindGroup(0, playerBindGroup);
     pass.draw(playerVertices.byteLength / 8, 1);

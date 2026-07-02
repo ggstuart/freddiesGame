@@ -1,28 +1,6 @@
-import { canvasBuffer, device, format } from "../setup.js";
-import { module } from "../shader.js";
+import { canvasBuffer, device } from "../setup.js";
 import { Bullet } from "./bullets.js";
-
-export const playerPipeline = device.createRenderPipeline({
-    label: "player pipeline",
-    layout: 'auto',
-    vertex: {
-        entryPoint: 'vsEntity',
-        module,
-        buffers: [
-            {
-                arrayStride: 8,
-                attributes: [
-                    {shaderLocation: 0, offset: 0, format: "float32x2"}
-                ]
-            }
-        ]
-    },
-    fragment: {
-        entryPoint: 'fsEntity',
-        module,
-        targets: [{ format }],
-     },
-})
+import { pipeline } from "../pipeline.js";
 
 export const playerVertices = new Float32Array([
   0.0, 0.075,
@@ -53,7 +31,7 @@ export const playerXYBuffer = device.createBuffer({
 device.queue.writeBuffer(playerXYBuffer, 0, playerXY);
 
 export const playerBindGroup = device.createBindGroup({
-  layout: playerPipeline.getBindGroupLayout(0),
+  layout: pipeline.getBindGroupLayout(0),
     entries: [
         { binding: 0, resource: { buffer: playerXYBuffer} },
         { binding: 1, resource: { buffer: canvasBuffer } }
@@ -61,7 +39,7 @@ export const playerBindGroup = device.createBindGroup({
 });
 
 export class Player {
-    constructor(shootCooldown = 0.5) { 
+    constructor(shootCooldown = 0.05) { 
         this.x = 0;
         this.y = -1;
         this.left = false;

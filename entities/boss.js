@@ -3,9 +3,7 @@ import { canvasBuffer, device } from "../setup.js";
 import { pipeline } from "../pipeline.js";
 import { Bullet } from "./bullets.js";
 
-export const maxEnemys = 150;
-
-const enemyVertices = new Float32Array([
+const bossVertices = new Float32Array([
     -0.025, 0.05,
     0.025, 0.05,
     0.0, 0.1,
@@ -17,36 +15,35 @@ const enemyVertices = new Float32Array([
     0.025, 0.05,
 ]);
 
-export const enemyVertexBuffer = device.createBuffer({
+export const bossVertexBuffer = device.createBuffer({
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    size: enemyVertices.byteLength,
+    size: bossVertices.byteLength,
 });
-device.queue.writeBuffer(enemyVertexBuffer, 0, enemyVertices);
+device.queue.writeBuffer(bossVertexBuffer, 0, bossVertices);
 
 
-// export const enemyXY = new Float32Array([0, 0]);
-export const enemyXYBuffer = device.createBuffer({
+// export const bossXY = new Float32Array([0, 0]);
+export const bossXYBuffer = device.createBuffer({
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-    size: maxEnemys * 8 * Float32Array.BYTES_PER_ELEMENT
+    size: 100 * 8 * Float32Array.BYTES_PER_ELEMENT
 })
 
-export const enemyBindGroup = device.createBindGroup({
+export const bossBindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(0),
     entries: [
-        { binding: 0, resource: { buffer: enemyXYBuffer} },
+        { binding: 0, resource: { buffer: bossXYBuffer} },
         { binding: 1, resource: { buffer: canvasBuffer } }
     ],
 });
 
-
-export class Enemy {
-    constructor(x, y, maxSpeed, shootCooldown=2) {
+export class Boss {
+    constructor(x, y, shootCooldown=0.15) {
         this.x = x;
         this.y = y;
-        this.xSpeed = (Math.random() * 2 - 1) * maxSpeed;
-        this.alive = true;
+        this.xSpeed = Math.random() + 1;
         this.bulletSpeed = -1;
-        this.radius = 0.025;
+        this.radius = 0.05;
+        this.HP = 5;
         this.shootCooldown = shootCooldown;
         this.timeToShoot = this.shootCooldown * Math.random();
     }
@@ -88,14 +85,14 @@ export class Enemy {
     }
 
 
-    // get alive() { 
-    //     return health > 0;
-    // }
+    get alive() { 
+        return this.HP > 0;
+    }
 }
 
-export function randomEnemy(maxEnemySpeed) {
-    const x = Math.random() * 2 - 1;
-    const y = 0.15 + Math.random() * 0.85;
-    return new Enemy(x, y, maxEnemySpeed);
+export function bossSpawner() {
+    const x = 0;
+    const y = 0.5;
+    return new Boss(x, y);
 
 }

@@ -1,30 +1,7 @@
-import { canvasBuffer, device, format } from "../setup.js";
-import { module } from "../shader.js";
+import { pipeline } from "../pipeline.js";
+import { canvasBuffer, device } from "../setup.js";
 
 export const maxBullets = 3000;
-
-export const bulletsPipeline = device.createRenderPipeline({
-    label: "bullets pipeline",
-    layout: 'auto',
-    vertex: {
-        entryPoint: 'vsEntity',
-        module,
-        buffers: [
-            {
-                arrayStride: 8,
-                attributes: [
-                    {shaderLocation: 0, offset: 0, format: "float32x2"}
-                ]
-            }
-        ]
-    },
-    fragment: {
-        entryPoint: 'fsEntity',
-        module,
-        targets: [{ format }],
-     },
-})
-
 
 let bulletvertices = new Float32Array([
     0.0, 0.01,      // top middle
@@ -40,15 +17,13 @@ export const bulletVertexBuffer = device.createBuffer({
 })
 device.queue.writeBuffer(bulletVertexBuffer, 0, bulletvertices);
 
-
-// export const bulletXY = new Float32Array([0, 0]);
 export const bulletXYBuffer = device.createBuffer({
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     size: maxBullets * 8 * Float32Array.BYTES_PER_ELEMENT
 })
 
 export const bulletBindGroup = device.createBindGroup({
-    layout: bulletsPipeline.getBindGroupLayout(0),
+    layout: pipeline.getBindGroupLayout(0),
     entries: [
         { binding: 0, resource: { buffer: bulletXYBuffer } },
         { binding: 1, resource: { buffer: canvasBuffer } }
