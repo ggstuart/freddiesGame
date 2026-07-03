@@ -40,7 +40,7 @@ export class Boss {
     constructor(x, y, shootCooldown=0.15) {
         this.x = x;
         this.y = y;
-        this.xSpeed = Math.random() + 1;
+        this.xSpeed = (Math.random() + 1) / 2;
         this.bulletSpeed = -1;
         this.radius = 0.05;
         this.HP = 5;
