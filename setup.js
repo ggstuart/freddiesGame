@@ -24,3 +24,10 @@ export const format = navigator.gpu.getPreferredCanvasFormat();
 export const context = canvas.getContext('webgpu');
 const alphamode = "premultiplied";
 context.configure({device, format, alphamode});
+
+export const canvasBuffer = device.createBuffer({
+    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    size: 8
+})
+
+device.queue.writeBuffer(canvasBuffer, 0, new Float32Array([canvas.width, canvas.height]));
